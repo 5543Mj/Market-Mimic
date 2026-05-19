@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Market Mimic</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <div class="brand">
+        <div class="brand-mark">M</div>
+        <div>
+          <h1>Market Mimic</h1>
+          <p>Grocery tracker</p>
+        </div>
+      </div>
+
+      <nav class="tabs" role="tablist" aria-label="Sections">
+        <button class="tab-btn active" role="tab" aria-selected="true" data-tab="history">History</button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="shopping">Shopping List</button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="settings">Settings</button>
+      </nav>
+      <div id="quote-desktop" class="quote-display"></div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div>
+          <h2 id="viewTitle">History</h2>
+          <p id="viewSubtitle">Add and manage your grocery catalog.</p>
+        </div>
+        <button class="icon-btn" id="openAddBtn" title="Add grocery item" aria-label="Add grocery item">+</button>
+      </header>
+
+      <section class="toolbar" id="historyToolbar">
+        <label class="search-wrap">
+          <span class="sr-only">Search items</span>
+          <input id="searchInput" type="search" placeholder="Search groceries, tags, stores..." />
+        </label>
+        <button class="icon-badge" id="filterBtn">Filter</button>
+      </section>
+
+      <section class="panel active" id="historyPanel" role="tabpanel" aria-labelledby="History">
+        <div id="historyList" class="list"></div>
+      </section>
+
+      <section class="panel" id="shoppingPanel" role="tabpanel" aria-labelledby="Shopping List">
+        <div id="shoppingList" class="list"></div>
+      </section>
+
+      <section class="panel" id="settingsPanel" role="tabpanel" aria-labelledby="Settings">
+
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h4>Theme</h4>
+            <p>Simple themes that are easy to extend later.</p>
+            <button class="primary-btn" id="themeBtn">Change theme</button>
+          </div>
+
+          <div class="settings-card">
+            <h4>Backup data</h4>
+            <p>Export all items as a JSON file.</p>
+            <button class="primary-btn" id="backupBtn">Download backup</button>
+          </div>
+
+          <div class="settings-card">
+            <h4>Restore data</h4>
+            <p>Import a JSON backup from this app.</p>
+            <input id="restoreInput" type="file" accept="application/json" hidden />
+            <button class="primary-btn" id="restoreBtn">Choose backup file</button>
+          </div>
+        </div>
+        <div id="quote-mobile" class="quote-display"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="sheet-backdrop hidden" id="itemModalBackdrop" aria-hidden="true"></div>
+  <section class="sheet hidden" id="itemModal" role="dialog" aria-modal="true" aria-labelledby="itemModalTitle">
+    <div class="sheet-header">
+      <h3 id="itemModalTitle">Add Grocery Item</h3>
+      <button class="icon-btn" id="closeItemModal" aria-label="Close">×</button>
+    </div>
+
+    <form id="itemForm" class="form-grid">
+      <input type="hidden" id="itemId" />
+
+      <label class="full">
+        Item name
+        <div class="inline-input-group">
+            <button type="button" id="openIconBtn" class="icon-badge icon-select-btn" aria-label="Select Icon"></button>
+            <input id="itemName" required placeholder="E.g., Milk" />
+            <input type="hidden" id="iconKey" value="box" />
+        </div>
+      </label>
+
+      <label class="full">
+        Stores (Select to edit pricing & URLs)
+        <div id="storeOptions" class="chip-grid"></div>
+      </label>
+
+      <div id="storeDetailsContainer" class="full store-details-grid"></div>
+
+      <label class="full">
+        Tags (Comma separated)
+        <input id="tagsInput" placeholder="dairy, food, snacks" />
+      </label>
+
+      <div class="form-actions full">
+        <button type="button" class="icon-badge" id="cancelItem">Cancel</button>
+        <button type="submit" class="primary-btn" id="saveItemBtn">Save item</button>
+      </div>
+    </form>
+  </section>
+
+  <div class="sheet-backdrop hidden" id="iconModalBackdrop" aria-hidden="true" style="z-index: 10;"></div>
+  <section class="sheet hidden" id="iconModal" role="dialog" aria-modal="true">
+    <div class="sheet-header">
+      <h3>Select Icon</h3>
+      <button class="icon-btn" id="closeIconModal" aria-label="Close">×</button>
+    </div>
+    <div id="iconGrid" class="icon-grid"></div>
+  </section>
+
+  <div class="sheet-backdrop hidden" id="filterModalBackdrop" aria-hidden="true"></div>
+  <section class="sheet hidden" id="filterModal" role="dialog" aria-modal="true" aria-labelledby="filterModalTitle">
+    <div class="sheet-header">
+      <h3 id="filterModalTitle">Filter History</h3>
+      <button class="icon-btn" id="closeFilterModal" aria-label="Close">×</button>
+    </div>
+
+    <div class="form-grid">
+      <label class="full">
+        Store
+        <select id="filterStore">
+          <option value="">All stores</option>
+        </select>
+      </label>
+
+      <label class="full">
+        Tag
+        <input id="filterTag" placeholder="dairy" />
+      </label>
+      
+      <label class="full">
+        Price Range
+        <div class="split-inputs">
+            <input id="filterMinPrice" type="number" step="0.01" min="0" placeholder="Min $" />
+            <input id="filterMaxPrice" type="number" step="0.01" min="0" placeholder="Max $" />
+        </div>
+      </label>
+
+      <label class="full checkbox-row">
+        <input id="onlyWithUrl" type="checkbox" />
+        Items with a store URL only
+      </label>
+
+      <div class="form-actions full">
+        <button type="button" class="icon-badge" id="clearFilters">Clear</button>
+        <button type="button" class="primary-btn" id="applyFilters">Apply</button>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
