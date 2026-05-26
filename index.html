@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Market Mimic</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" type="image/x-icon" href="/img/icon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="img/mic.png">
   <script defer src="app.js"></script>
 </head>
 <body>
@@ -41,7 +42,7 @@
           <span class="sr-only">Search items</span>
           <input id="searchInput" type="search" placeholder="Search groceries, tags, stores..." />
         </label>
-        <button class="icon-badge" id="filterBtn">Filter</button>
+        <button class="secondary-btn" id="filterBtn">Filter</button>
       </section>
 
       <section class="panel active" id="historyPanel" role="tabpanel" aria-labelledby="History">
@@ -53,7 +54,6 @@
       </section>
 
       <section class="panel" id="settingsPanel" role="tabpanel" aria-labelledby="Settings">
-
         <div class="settings-grid">
           <div class="settings-card">
             <h4>Theme</h4>
@@ -106,13 +106,19 @@
       <div id="storeDetailsContainer" class="full store-details-grid"></div>
 
       <label class="full">
-        Tags (Comma separated)
-        <input id="tagsInput" placeholder="dairy, food, snacks" />
+        Tags (Press Enter to add)
+        <div class="tag-input-container">
+          <div id="tagChipContainer" class="tag-chip-container"></div>
+          <input id="tagInputField" placeholder="Add a tag..." autocomplete="off" />
+        </div>
       </label>
 
-      <div class="form-actions full">
-        <button type="button" class="icon-badge" id="cancelItem">Cancel</button>
-        <button type="submit" class="primary-btn" id="saveItemBtn">Save item</button>
+      <div class="form-actions full" style="justify-content: space-between;">
+        <button type="button" class="secondary-btn danger-text hidden" id="deleteItemBtn">Delete Item</button>
+        <div style="display: flex; gap: 10px; margin-left: auto;">
+            <button type="button" class="secondary-btn" id="cancelItem">Cancel</button>
+            <button type="submit" class="primary-btn" id="saveItemBtn">Save item</button>
+        </div>
       </div>
     </form>
   </section>
@@ -160,7 +166,7 @@
       </label>
 
       <div class="form-actions full">
-        <button type="button" class="icon-badge" id="clearFilters">Clear</button>
+        <button type="button" class="secondary-btn" id="clearFilters">Clear</button>
         <button type="button" class="primary-btn" id="applyFilters">Apply</button>
       </div>
     </div>
