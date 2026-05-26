@@ -2,10 +2,10 @@ const STORAGE_KEY = 'mimicMart';
 
 const DEFAULT_ICONS = {
   box: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7l8-4 8 4-8 4-8-4Z"></path><path d="M4 7v10l8 4 8-4V7"></path><path d="M12 11v10"></path></svg>`,
-  milk: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v3l2 3v12H6V9l2-3V3Z"></path><path d="M9 3h6"></path><path d="M8 10h8"></path></svg>`,
+  drink: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v3l2 3v12H6V9l2-3V3Z"></path><path d="M9 3h6"></path><path d="M8 10h8"></path></svg>`,
   cart: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7"></path><circle cx="10" cy="19" r="1.5"></circle><circle cx="17" cy="19" r="1.5"></circle></svg>`,
   apple: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2-3 5-3 6-1 1 2 1 5-1 7-1 2-3 4-5 4s-4-2-5-4c-2-2-2-5-1-7 1-2 4-2 6 1Z"></path><path d="M12 6c0-2 1-3 3-4"></path></svg>`,
-  snack: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h14l-1 10H6L5 9Z"></path><path d="M8 9c0-3 2-5 4-5s4 2 4 5"></path></svg>`,
+  basket: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h14l-1 10H6L5 9Z"></path><path d="M8 9c0-3 2-5 4-5s4 2 4 5"></path></svg>`,
   bread: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10c0-4 4-7 8-7s8 3 8 7v9H4v-9Z"></path><path d="M8 10v9M12 10v9M16 10v9"></path></svg>`,
 };
 
@@ -54,8 +54,8 @@ const state = migrateState(loadState()) ?? {
     {
       id: crypto.randomUUID(),
       name: 'Milk',
-      iconKey: 'milk',
-      tags: ['dairy', 'food'],
+      iconKey: 'drink',
+      tags: ['dairy', 'drink'],
       storeDetails: {
         'Walmart': { price: 3.49, unitPrice: 0.22, unitType: 'oz', url: 'https://www.walmart.com/' }
       },
@@ -72,6 +72,7 @@ let editingItemId = null;
 let editingIconItemId = null; 
 let editingStoreDetails = {}; 
 let swipeStartX = null;
+let currentModalTags = [];
 
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
@@ -96,6 +97,7 @@ const els = {
   itemForm: $('#itemForm'),
   closeItemModal: $('#closeItemModal'),
   cancelItem: $('#cancelItem'),
+  deleteItemBtn: $('#deleteItemBtn'),
   itemModalTitle: $('#itemModalTitle'),
   itemId: $('#itemId'),
   itemName: $('#itemName'),
@@ -107,7 +109,8 @@ const els = {
   iconGrid: $('#iconGrid'),
   storeOptions: $('#storeOptions'),
   storeDetailsContainer: $('#storeDetailsContainer'),
-  tagsInput: $('#tagsInput'),
+  tagChipContainer: $('#tagChipContainer'),
+  tagInputField: $('#tagInputField'),
   filterModal: $('#filterModal'),
   filterModalBackdrop: $('#filterModalBackdrop'),
   closeFilterModal: $('#closeFilterModal'),
@@ -132,6 +135,15 @@ function money(value) {
 
 function parseTags(str = '') { return str.split(',').map((t) => t.trim()).filter(Boolean); }
 function uniq(arr) { return [...new Set(arr)]; }
+
+function renderModalTags() {
+    els.tagChipContainer.innerHTML = currentModalTags.map((tag, index) => `
+        <span class="ao3-tag">
+            ${escapeHtml(tag)}
+            <button type="button" class="ao3-tag-delete" data-index="${index}">&times;</button>
+        </span>
+    `).join('');
+}
 
 function iconMarkup(key) { return DEFAULT_ICONS[key] || DEFAULT_ICONS.box; }
 
@@ -169,7 +181,17 @@ function openItemModal(item = null) {
   els.itemName.value = item?.name ?? '';
   els.iconKey.value = item?.iconKey ?? 'box';
   updateSelectedIconDisplay();
-  els.tagsInput.value = item?.tags?.join(', ') ?? '';
+  
+  // NEW: Handle AO3 tags
+  currentModalTags = item?.tags ? [...item.tags] : [];
+  renderModalTags();
+  els.tagInputField.value = '';
+
+  if (item) {
+      els.deleteItemBtn.classList.remove('hidden');
+  } else {
+      els.deleteItemBtn.classList.add('hidden');
+  }
 
   editingStoreDetails = item?.storeDetails ? structuredClone(item.storeDetails) : {};
   syncStoreChipsInModal(); renderStoreDetailsFields();
@@ -203,12 +225,13 @@ function renderStoreDetailsFields() {
       <div class="store-detail-box">
          <h5>${escapeHtml(store)}</h5>
          <div class="split-inputs">
-            <label>Price
+            <label>Total Price
               <input type="number" step="0.01" min="0" data-store="${store}" data-field="price" value="${data.price}" placeholder="3.49" />
             </label>
-            <label>Unit Info
+            <label>Size & Unit Price
               <div class="unit-inputs">
-                <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitPrice" value="${data.unitPrice}" placeholder="0.22" />
+                <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitSize" value="${data.unitSize || ''}" placeholder="Qty (e.g. 16)" />
+                <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitPrice" value="${data.unitPrice}" placeholder="Unit $" />
                 <select data-store="${store}" data-field="unitType">
                    <option value="oz" ${data.unitType === 'oz' ? 'selected' : ''}>oz</option>
                    <option value="lb" ${data.unitType === 'lb' ? 'selected' : ''}>lb</option>
@@ -225,8 +248,26 @@ function renderStoreDetailsFields() {
 }
 
 els.storeDetailsContainer.addEventListener('input', (e) => {
-   const store = e.target.dataset.store; const field = e.target.dataset.field;
-   if (store && field) editingStoreDetails[store][field] = e.target.value;
+   const store = e.target.dataset.store; 
+   const field = e.target.dataset.field;
+   if (!store || !field) return;
+   
+   editingStoreDetails[store][field] = e.target.value;
+
+   // Auto-calculate unit price if price or size changes
+   if (field === 'price' || field === 'unitSize') {
+       const price = parseFloat(editingStoreDetails[store].price);
+       const size = parseFloat(editingStoreDetails[store].unitSize);
+       
+       if (!isNaN(price) && !isNaN(size) && size > 0) {
+           const calculated = (price / size).toFixed(2);
+           editingStoreDetails[store].unitPrice = calculated;
+           
+           // Update the UI directly without re-rendering to keep keyboard focus
+           const unitPriceInput = els.storeDetailsContainer.querySelector(`input[data-store="${store}"][data-field="unitPrice"]`);
+           if (unitPriceInput) unitPriceInput.value = calculated;
+       }
+   }
 });
 
 function openFilterModal() {
@@ -271,7 +312,6 @@ function getVisibleItems() {
 function generateCardHTML(item, isShoppingList = false) {
     const stores = Object.keys(item.storeDetails || {});
     
-    // Uses the saved `lastSelectedStore`, otherwise defaults to the first one available
     const selectedStore = (item.lastSelectedStore && stores.includes(item.lastSelectedStore)) 
         ? item.lastSelectedStore 
         : (stores[0] || null);
@@ -288,7 +328,6 @@ function generateCardHTML(item, isShoppingList = false) {
     if (selectedStore) {
         const d = item.storeDetails[selectedStore];
         
-        // Hide Unit Block if empty
         const unitMarkup = d.unitPrice 
            ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${money(d.unitPrice)}</div></div>` 
            : '';
@@ -300,11 +339,11 @@ function generateCardHTML(item, isShoppingList = false) {
         if (d.url) linkMarkup = `<a class="chip url-link" href="${escapeHtml(d.url)}" target="_blank" rel="noopener">Visit ${escapeHtml(selectedStore)}</a>`;
     }
 
-    // Top Right Action Buttons Structure
     let actionMarkup;
     if (isShoppingList) {
         actionMarkup = `
             <button class="action-btn" data-action="edit-shopping" data-id="${item.id}" title="Edit">✎</button>
+            <button class="action-btn danger-text" data-action="remove-from-cart" data-id="${item.id}" title="Remove from list">✕</button>
             <label class="check-btn" title="Check off list">
                <input type="checkbox" data-action="toggle-bought" data-id="${item.id}" ${item.bought ? 'checked' : ''} />
             </label>
@@ -312,12 +351,11 @@ function generateCardHTML(item, isShoppingList = false) {
     } else {
         const inCart = state.shopping.some((x) => x.sourceId === item.id || x.id === item.id);
         const addBtn = inCart 
-           ? `<button class="action-btn in-cart check-remove-btn" data-action="remove-from-cart-history" data-id="${item.id}" title="Remove from Cart">✓</button>`
+           ? `<button class="action-btn in-cart check-remove-btn" data-action="remove-from-cart" data-id="${item.id}" title="Remove from Cart">✓</button>`
            : `<button class="action-btn plus-text" data-action="add-to-shopping" data-id="${item.id}" title="Add to Cart">＋</button>`;
            
         actionMarkup = `
             <button class="action-btn" data-action="edit-item" data-id="${item.id}" title="Edit">✎</button>
-            <button class="action-btn danger-text" data-action="delete-item" data-id="${item.id}" title="Delete">✕</button>
             ${addBtn}
         `;
     }
@@ -386,8 +424,11 @@ function upsertItem() {
   const existingItem = state.items.find((x) => x.id === els.itemId.value);
 
   const item = {
-    id: els.itemId.value || crypto.randomUUID(), name: els.itemName.value.trim(), iconKey: els.iconKey.value,
-    storeDetails: structuredClone(editingStoreDetails), tags: uniq(parseTags(els.tagsInput.value)),
+    id: els.itemId.value || crypto.randomUUID(), 
+    name: els.itemName.value.trim(), 
+    iconKey: els.iconKey.value,
+    storeDetails: structuredClone(editingStoreDetails), 
+    tags: [...currentModalTags], // <-- Change this line
     createdAt: existingItem?.createdAt || Date.now(),
     lastSelectedStore: existingItem?.lastSelectedStore || null
   };
@@ -431,7 +472,6 @@ function switchCardStoreInfo(actionEl) {
    card.querySelectorAll('.store-tab-btn').forEach(c => c.classList.remove('active-store'));
    actionEl.classList.add('active-store');
 
-   // Persist choice to the relevant state arrays
    let found = false;
    const historyItem = state.items.find(x => x.id === itemId);
    if (historyItem) { historyItem.lastSelectedStore = storeName; found = true; }
@@ -500,6 +540,13 @@ function initEvents() {
   els.itemForm.addEventListener('submit', (e) => { e.preventDefault(); upsertItem(); closeItemModal(); });
   els.closeItemModal.addEventListener('click', closeItemModal); els.cancelItem.addEventListener('click', closeItemModal); els.itemModalBackdrop.addEventListener('click', closeItemModal);
   
+  els.deleteItemBtn.addEventListener('click', () => {
+    if (editingItemId && confirm('Are you sure you want to completely delete this item from your catalog?')) {
+        deleteItem(editingItemId);
+        closeItemModal();
+    }
+  });
+
   els.storeOptions.addEventListener('click', (e) => {
     const btn = e.target.closest('.form-store-chip');
     if (btn) toggleStoreInModal(btn.dataset.store);
@@ -541,8 +588,7 @@ function initEvents() {
        openModal(els.iconModal, els.iconModalBackdrop);
     }
     if (action === 'add-to-shopping') addToShopping(id);
-    if (action === 'remove-from-cart-history') {
-       // Only removes from the shopping list, keeping it in history!
+    if (action === 'remove-from-cart') {
        state.shopping = state.shopping.filter((x) => x.sourceId !== id && x.id !== id);
        updateAndRender();
     }
@@ -551,13 +597,45 @@ function initEvents() {
       const item = source.find((x) => x.id === id);
       if (item) { editingIconItemId = null; openItemModal(item); }
     }
-    if (action === 'delete-item') deleteItem(id);
     if (action === 'switch-store') switchCardStoreInfo(actionEl);
   });
 
   els.shoppingList.addEventListener('change', (e) => {
     const input = e.target.closest('[data-action="toggle-bought"]');
     if (input) toggleBought(input.dataset.id, input.checked);
+  });
+
+  els.tagInputField.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+          e.preventDefault(); // Stop the whole form from submitting
+          const val = e.target.value.trim();
+          if (val && !currentModalTags.includes(val)) {
+              currentModalTags.push(val);
+              renderModalTags();
+          }
+          e.target.value = '';
+      }
+  });
+
+  els.tagChipContainer.addEventListener('click', (e) => {
+      // 1. Use closest() to ensure we get the button even if the inner text is clicked
+      const deleteBtn = e.target.closest('.ao3-tag-delete');
+      if (!deleteBtn) return;
+
+      // 2. Stop the click from bubbling up and triggering anything else
+      e.preventDefault();
+      e.stopPropagation();
+
+      const indexAttr = deleteBtn.getAttribute('data-index');
+      if (indexAttr === null) return;
+
+      const idx = parseInt(indexAttr, 10);
+      
+      // 3. Strict safety check: Only splice if idx is a valid number
+      if (!isNaN(idx) && idx >= 0 && idx < currentModalTags.length) {
+          currentModalTags.splice(idx, 1);
+          renderModalTags();
+      }
   });
 
   const swipeArea = document.querySelector('.main-panel');
