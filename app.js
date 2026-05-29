@@ -9,11 +9,12 @@ const DEFAULT_ICONS = {
   bread: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10c0-4 4-7 8-7s8 3 8 7v9H4v-9Z"></path><path d="M8 10v9M12 10v9M16 10v9"></path></svg>`,
 };
 
-const STORE_OPTIONS = ['Walmart', 'Costco', 'Amazon']; 
+const STORE_OPTIONS = ['Walmart', 'Costco', 'Albertsons', 'Broulims']; 
 const STORE_HOME_URLS = {
   'Walmart': 'https://www.walmart.com/',
   'Costco': 'https://www.costco.com/',
-  'Amazon': 'https://www.amazon.com/'
+  'Albertsons': 'https://www.albertsons.com/',
+  'Broulims': 'https://www.broulims.com/store/'
 };
 const THEMES = ['default', 'ocean', 'sunset'];
 
@@ -53,11 +54,14 @@ const state = migrateState(loadState()) ?? {
   items: [
     {
       id: crypto.randomUUID(),
-      name: 'Milk',
+      name: 'Gallon of Milk',
       iconKey: 'drink',
       tags: ['dairy', 'drink'],
       storeDetails: {
-        'Walmart': { price: 3.49, unitPrice: 0.22, unitType: 'oz', url: 'https://www.walmart.com/' }
+        'Walmart': { price: 3.82, unitSize: 128, unitPrice: 2.98, unitType: 'oz', url: 'https://www.walmart.com/ip/Great-Value-Whole-Vitamin-D-Milk-Gallon-Plastic-Jug-128-Fl-Oz/10450114?classType=REGULAR&athbdg=L1200&sid=fb8f47b6-93b0-4fd9-b4c5-00a53bdb5fa9' },
+        'Costco': { price: 6.59, unitSize: 256, unitPrice: 2.57, unitType: 'oz', url: 'https://app.warehouserunner.com/costco/2-kirkland-signature-homogenized-milk-2-1-gal' },
+        'Albertsons': { price: 3.49, unitSize: 256, unitPrice: 2.73, unitType: 'oz', url: 'https://www.albertsons.com/shop/product-details.136010121.html' },
+        'Broulims': { price: 3.99, unitSize: 128, unitPrice: 3.12, unitType: 'oz', url: 'https://shop.broulims.com/store/broulims-supermarket/products/17664246-food-club-whole-milk-1-gl' }
       },
       createdAt: Date.now() - 86400000,
     },
@@ -224,22 +228,23 @@ function renderStoreDetailsFields() {
     return `
       <div class="store-detail-box">
          <h5>${escapeHtml(store)}</h5>
-         <div class="split-inputs">
-            <label>Total Price
-              <input type="number" step="0.01" min="0" data-store="${store}" data-field="price" value="${data.price}" placeholder="3.49" />
-            </label>
-            <label>Size & Unit Price
-              <div class="unit-inputs">
-                <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitSize" value="${data.unitSize || ''}" placeholder="Qty (e.g. 16)" />
-                <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitPrice" value="${data.unitPrice}" placeholder="Unit $" />
-                <select data-store="${store}" data-field="unitType">
-                   <option value="oz" ${data.unitType === 'oz' ? 'selected' : ''}>oz</option>
-                   <option value="lb" ${data.unitType === 'lb' ? 'selected' : ''}>lb</option>
-                </select>
-              </div>
-            </label>
-         </div>
-         <label>URL (Auto defaults if blank)
+         
+         <label>Total Price
+            <input type="number" step="0.01" min="0" data-store="${store}" data-field="price" value="${data.price}" placeholder="$0.00" />
+         </label>
+         
+         <label>Size & Unit Price
+            <div class="unit-inputs">
+              <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitSize" value="${data.unitSize || ''}" placeholder="oz/lb" />
+              <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitPrice" value="${data.unitPrice}" placeholder="¢ per oz/lb" />
+              <select data-store="${store}" data-field="unitType">
+                 <option value="oz" ${data.unitType === 'oz' ? 'selected' : ''}>oz</option>
+                 <option value="lb" ${data.unitType === 'lb' ? 'selected' : ''}>lb</option>
+              </select>
+            </div>
+         </label>
+
+         <label>URL
             <input type="url" data-store="${store}" data-field="url" value="${escapeHtml(data.url)}" placeholder="https://..." />
          </label>
       </div>
@@ -255,17 +260,17 @@ els.storeDetailsContainer.addEventListener('input', (e) => {
    editingStoreDetails[store][field] = e.target.value;
 
    // Auto-calculate unit price if price or size changes
-   if (field === 'price' || field === 'unitSize') {
-       const price = parseFloat(editingStoreDetails[store].price);
-       const size = parseFloat(editingStoreDetails[store].unitSize);
+    if (field === 'price' || field === 'unitSize') {
+      const price = parseFloat(editingStoreDetails[store].price);
+      const size = parseFloat(editingStoreDetails[store].unitSize);
        
-       if (!isNaN(price) && !isNaN(size) && size > 0) {
-           const calculated = (price / size).toFixed(2);
-           editingStoreDetails[store].unitPrice = calculated;
+      if (!isNaN(price) && !isNaN(size) && size > 0) {
+        // Multiply by 100 to shift the decimal 2 places
+        const calculated = ((price / size) * 100).toFixed(2);
+        editingStoreDetails[store].unitPrice = calculated;
            
-           // Update the UI directly without re-rendering to keep keyboard focus
-           const unitPriceInput = els.storeDetailsContainer.querySelector(`input[data-store="${store}"][data-field="unitPrice"]`);
-           if (unitPriceInput) unitPriceInput.value = calculated;
+        const unitPriceInput = els.storeDetailsContainer.querySelector(`input[data-store="${store}"][data-field="unitPrice"]`);
+        if (unitPriceInput) unitPriceInput.value = calculated;
        }
    }
 });
@@ -329,7 +334,7 @@ function generateCardHTML(item, isShoppingList = false) {
         const d = item.storeDetails[selectedStore];
         
         const unitMarkup = d.unitPrice 
-           ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${money(d.unitPrice)}</div></div>` 
+           ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${Number(d.unitPrice).toFixed(2)}¢</div></div>` 
            : '';
 
         priceMarkup = `
@@ -488,7 +493,8 @@ function switchCardStoreInfo(actionEl) {
    
    const priceStats = card.querySelector(`#price-stats-${item.id}`);
    if(priceStats) {
-      const unitMarkup = d.unitPrice ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${money(d.unitPrice)}</div></div>` : '';
+      // Replaced money(d.unitPrice) here as well
+      const unitMarkup = d.unitPrice ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${Number(d.unitPrice).toFixed(2)}¢</div></div>` : '';
       priceStats.innerHTML = `<div class="price-group"><div class="price">${money(d.price)}</div></div>${unitMarkup}`;
    }
    
