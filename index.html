@@ -50,6 +50,11 @@
       </section>
 
       <section class="panel" id="shoppingPanel" role="tabpanel" aria-labelledby="Shopping List">
+        <div class="toolbar" style="margin-bottom: 12px;">
+           <select id="shoppingStoreFilter">
+             <option value="">All Stores</option>
+           </select>
+        </div>
         <div id="shoppingList" class="list"></div>
       </section>
 
@@ -150,6 +155,21 @@
       <label class="full">
         Tag
         <input id="filterTag" placeholder="dairy" />
+      </label>
+
+      <label class="full">
+        Sort By
+        <div class="split-inputs">
+          <select id="filterSortBy">
+            <option value="name">Name</option>
+            <option value="minPrice">Min Price</option>
+            <option value="minPricePer">Min Price Per</option>
+          </select>
+          <select id="filterSortOrder">
+            <option value="asc">A-Z / Low-High</option>
+            <option value="desc">Z-A / High-Low</option>
+          </select>
+        </div>
       </label>
       
       <label class="full">
