@@ -162,6 +162,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); box-sha
   display: flex; justify-content: center; align-items: center; /* Changed from grid */
   font-size: 1.15rem; /* Explicitly forced larger for mobile */
   line-height: 1; padding: 0; transition: 0.1s;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
 .action-btn:hover { border-color: var(--accent); }
 .action-btn.danger-text { color: #fca5a5; }
@@ -253,8 +254,14 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); box-sha
   background: var(--panel-2); border: 1px solid var(--line); 
   border-radius: 12px; padding: 12px; display: grid; gap: 10px; 
 }
+.store-detail-box label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: .9rem;
+}
 .store-detail-box h5 { margin: 0; font-size: .95rem; color: var(--accent); }
-.split-inputs {  gap: 10px; }
+.split-inputs {  gap: 10px; display: flex;}
 .unit-inputs { display: flex; gap: 6px; }
 .unit-inputs input { flex: 1; min-width: 0; }
 .unit-inputs select { width: 75px; flex-shrink: 0; padding: .75rem .5rem;}
@@ -273,6 +280,10 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); box-sha
   stroke: currentColor; 
   stroke-width: 1.5; 
   color: var(--text); 
+}
+
+select {
+  padding-right: 32px;
 }
 
 .tag-input-container {
@@ -351,6 +362,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); box-sha
   .tabs { grid-template-columns: repeat(3, 1fr); }
   .tab-btn { text-align: center; padding: 12px 8px; font-size: .9rem; }
   .main-panel { padding-bottom: 90px; height: 100vh; }
+  .panel { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
   .settings-grid { grid-template-columns: 1fr; }
   .sheet:not(#iconModal) { inset: auto 10px 10px 10px; width: auto; max-height: 85vh; border-radius: 20px 20px 16px 16px; }
 }
