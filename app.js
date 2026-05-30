@@ -9,12 +9,17 @@ const DEFAULT_ICONS = {
   bread: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10c0-4 4-7 8-7s8 3 8 7v9H4v-9Z"></path><path d="M8 10v9M12 10v9M16 10v9"></path></svg>`,
 };
 
-const STORE_OPTIONS = ['Walmart', 'Costco', 'Albertsons', 'Broulims']; 
+const STORE_OPTIONS = ['Albertsons', 'Amazon', 'Costco', 'HEB', 'Kroger', 'Target', "Trader Joe's", 'Walmart', 'WinCo']; 
 const STORE_HOME_URLS = {
-  'Walmart': 'https://www.walmart.com/',
-  'Costco': 'https://www.costco.com/',
   'Albertsons': 'https://www.albertsons.com/',
-  'Broulims': 'https://www.broulims.com/store/'
+  'Amazon': 'https://www.amazon.com/',
+  'Costco': 'https://www.costco.com/',
+  'HEB': 'https://www.heb.com/',
+  'Kroger': 'https://www.kroger.com/',
+  'Target': 'https://www.target.com/',
+  'TraderJoes': 'https://www.traderjoes.com/',
+  'Walmart': 'https://www.walmart.com/',
+  'WinCo': 'https://www.wincofoods.com/'
 };
 const THEMES = ['default', 'ocean', 'sunset'];
 
@@ -56,19 +61,23 @@ const state = migrateState(loadState()) ?? {
       id: crypto.randomUUID(),
       name: 'Gallon of Milk',
       iconKey: 'drink',
-      tags: ['dairy', 'drink'],
+      tags: ['Dairy', 'Drink'],
       storeDetails: {
-        'Walmart': { price: 3.82, unitSize: 128, unitPrice: 2.98, unitType: 'oz', url: 'https://www.walmart.com/ip/Great-Value-Whole-Vitamin-D-Milk-Gallon-Plastic-Jug-128-Fl-Oz/10450114?classType=REGULAR&athbdg=L1200&sid=fb8f47b6-93b0-4fd9-b4c5-00a53bdb5fa9' },
+        'Albertsons': { price: 3.49, unitSize: 128, unitPrice: 2.73, unitType: 'oz', url: 'https://www.albertsons.com/shop/product-details.136010121.html' },
+        'Amazon': { price: 5.19, unitSize: 128, unitPrice: 4.05, unitType: 'oz', url: 'https://www.amazon.com/dp/B074VDFX51' },
         'Costco': { price: 6.59, unitSize: 256, unitPrice: 2.57, unitType: 'oz', url: 'https://app.warehouserunner.com/costco/2-kirkland-signature-homogenized-milk-2-1-gal' },
-        'Albertsons': { price: 3.49, unitSize: 256, unitPrice: 2.73, unitType: 'oz', url: 'https://www.albertsons.com/shop/product-details.136010121.html' },
-        'Broulims': { price: 3.99, unitSize: 128, unitPrice: 3.12, unitType: 'oz', url: 'https://shop.broulims.com/store/broulims-supermarket/products/17664246-food-club-whole-milk-1-gl' }
+        'HEB': { price: 3.86, unitSize: 128, unitPrice: 3.02, unitType: 'oz', url: 'https://www.heb.com/product-detail/h-e-b-whole-milk-1-gal/314130' },
+        'Kroger': { price: 3.29, unitSize: 128, unitPrice: 2.57, unitType: 'oz', url: 'https://www.kroger.com/p/kroger-vitamin-d-whole-milk-gallon/0001111040101' },
+        'Target': { price: 4.59, unitSize: 128, unitPrice: 3.59, unitType: 'oz', url: 'https://www.target.com/p/meadow-gold-milk/-/A-94758362?preselect=81585047' },
+        'TraderJoes': { price: 5.69, unitSize: 64, unitPrice: 8.89, unitType: 'oz', url: 'https://www.traderjoes.com/home/products/pdp/organic-lactose-free-reduced-fat-milk-082978' },
+        'Walmart': { price: 3.82, unitSize: 128, unitPrice: 2.98, unitType: 'oz', url: 'https://www.walmart.com/ip/Great-Value-Whole-Vitamin-D-Milk-Gallon-Plastic-Jug-128-Fl-Oz/10450114' },
+        'WinCo': { price: 3.75, unitSize: 128, unitPrice: 2.93, unitType: 'oz', url: 'https://www.wincofoods.com/ '}
       },
-      createdAt: Date.now() - 86400000,
-    },
+      },
   ],
   shopping: [],
   settings: { theme: 'default' },
-  filters: { query: '', store: '', tag: '', minPrice: '', maxPrice: '', onlyWithUrl: false },
+  filters: { query: '', store: '', tag: '', minPrice: '', maxPrice: '', onlyWithUrl: false, sortBy: 'name', sortDesc: false },
 };
 
 let activeTab = 'history';
@@ -86,6 +95,7 @@ const els = {
   panels: { history: $('#historyPanel'), shopping: $('#shoppingPanel'), settings: $('#settingsPanel') },
   historyList: $('#historyList'),
   shoppingList: $('#shoppingList'),
+  shoppingStoreFilter: $('#shoppingStoreFilter'),
   viewTitle: $('#viewTitle'),
   viewSubtitle: $('#viewSubtitle'),
   searchInput: $('#searchInput'),
@@ -122,6 +132,8 @@ const els = {
   filterTag: $('#filterTag'),
   filterMinPrice: $('#filterMinPrice'),
   filterMaxPrice: $('#filterMaxPrice'),
+  filterSortBy: $('#filterSortBy'),
+  filterSortOrder: $('#filterSortOrder'),
   onlyWithUrl: $('#onlyWithUrl'),
   clearFilters: $('#clearFilters'),
   applyFilters: $('#applyFilters'),
@@ -158,6 +170,9 @@ function renderUIOptions() {
   els.storeOptions.innerHTML = STORE_OPTIONS.map((store) => `
     <button type="button" class="chip-btn form-store-chip" data-store="${escapeHtml(store)}">${escapeHtml(store)}</button>
   `).join('');
+
+  els.shoppingStoreFilter.innerHTML = `<option value="">All stores</option>` +
+    STORE_OPTIONS.map((store) => `<option value="${escapeHtml(store)}">${escapeHtml(store)}</option>`).join('');
 
   els.iconGrid.innerHTML = Object.entries(DEFAULT_ICONS).map(([key, svg]) => `
     <button type="button" class="icon-grid-item" data-icon="${key}" title="${key}">
@@ -260,17 +275,21 @@ els.storeDetailsContainer.addEventListener('input', (e) => {
    editingStoreDetails[store][field] = e.target.value;
 
    // Auto-calculate unit price if price or size changes
-    if (field === 'price' || field === 'unitSize') {
-      const price = parseFloat(editingStoreDetails[store].price);
-      const size = parseFloat(editingStoreDetails[store].unitSize);
+    if (field === 'price' || field === 'unitSize' || field === 'unitType') {
+       const price = parseFloat(editingStoreDetails[store].price);
+       const size = parseFloat(editingStoreDetails[store].unitSize);
+       const type = editingStoreDetails[store].unitType || 'oz';
        
-      if (!isNaN(price) && !isNaN(size) && size > 0) {
-        // Multiply by 100 to shift the decimal 2 places
-        const calculated = ((price / size) * 100).toFixed(2);
-        editingStoreDetails[store].unitPrice = calculated;
+       if (!isNaN(price) && !isNaN(size) && size > 0) {
+           // If 'lb', leave as dollars. If 'oz', multiply by 100 for cents.
+           const calculated = type === 'lb' 
+               ? (price / size).toFixed(2) 
+               : ((price / size) * 100).toFixed(2);
+               
+           editingStoreDetails[store].unitPrice = calculated;
            
-        const unitPriceInput = els.storeDetailsContainer.querySelector(`input[data-store="${store}"][data-field="unitPrice"]`);
-        if (unitPriceInput) unitPriceInput.value = calculated;
+           const unitPriceInput = els.storeDetailsContainer.querySelector(`input[data-store="${store}"][data-field="unitPrice"]`);
+           if (unitPriceInput) unitPriceInput.value = calculated;
        }
    }
 });
@@ -281,6 +300,10 @@ function openFilterModal() {
   els.filterMinPrice.value = state.filters.minPrice || ''; 
   els.filterMaxPrice.value = state.filters.maxPrice || ''; 
   els.onlyWithUrl.checked = state.filters.onlyWithUrl;
+  
+  els.filterSortBy.value = state.filters.sortBy || 'name';
+  els.filterSortOrder.value = state.filters.sortDesc ? 'desc' : 'asc';
+  
   openModal(els.filterModal, els.filterModalBackdrop);
 }
 function closeFilterModal() { closeModal(els.filterModal, els.filterModalBackdrop); }
@@ -315,7 +338,21 @@ function getVisibleItems() {
 }
 
 function generateCardHTML(item, isShoppingList = false) {
-    const stores = Object.keys(item.storeDetails || {});
+    const stores = Object.keys(item.storeDetails || {}).sort((a, b) => {
+        const dA = item.storeDetails[a];
+        const dB = item.storeDetails[b];
+        
+        // Push stores with no prices to the back
+        if (!dA.unitPrice && !dB.unitPrice) return 0;
+        if (!dA.unitPrice) return 1;
+        if (!dB.unitPrice) return -1;
+
+        // Normalize both to a "cents per ounce" value to compare fairly
+        const priceA = dA.unitType === 'lb' ? (Number(dA.unitPrice) * 100) / 16 : Number(dA.unitPrice);
+        const priceB = dB.unitType === 'lb' ? (Number(dB.unitPrice) * 100) / 16 : Number(dB.unitPrice);
+        
+        return priceA - priceB;
+    });
     
     const selectedStore = (item.lastSelectedStore && stores.includes(item.lastSelectedStore)) 
         ? item.lastSelectedStore 
@@ -333,8 +370,12 @@ function generateCardHTML(item, isShoppingList = false) {
     if (selectedStore) {
         const d = item.storeDetails[selectedStore];
         
+        const isLb = d.unitType === 'lb';
+        const unitVal = Number(d.unitPrice).toFixed(2);
+        const unitDisplay = isLb ? `$${unitVal}` : `${unitVal}¢`;
+        
         const unitMarkup = d.unitPrice 
-           ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${Number(d.unitPrice).toFixed(2)}¢</div></div>` 
+           ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${unitDisplay}</div></div>` 
            : '';
 
         priceMarkup = `
@@ -392,15 +433,84 @@ function generateCardHTML(item, isShoppingList = false) {
     `;
 }
 
+function getNormalizedItemPrice(item, type) {
+    const stores = Object.values(item.storeDetails || {});
+    let validPrices = [];
+    
+    if (type === 'minPricePer') {
+        // Extract valid unit prices, converting lbs to oz so they sort fairly
+        validPrices = stores
+            .filter(d => d.unitPrice && Number(d.unitPrice) > 0)
+            .map(d => d.unitType === 'lb' ? (Number(d.unitPrice) * 100) / 16 : Number(d.unitPrice));
+    } else if (type === 'minPrice') {
+        // Extract valid total prices
+        validPrices = stores
+            .filter(d => d.price && Number(d.price) > 0)
+            .map(d => Number(d.price));
+    }
+    
+    // If an item has no prices entered, assign it Infinity so it drops to the bottom
+    if (validPrices.length === 0) return Infinity;
+    
+    // Return the smallest price found across the stores for this item
+    return Math.min(...validPrices);
+}
+
+function sortItems(items) {
+    const sortBy = state.filters.sortBy || 'name';
+    const sortDesc = !!state.filters.sortDesc;
+
+    return items.sort((a, b) => {
+        if (sortBy === 'name') {
+            const valA = a.name.toLowerCase();
+            const valB = b.name.toLowerCase();
+            if (valA < valB) return sortDesc ? 1 : -1;
+            if (valA > valB) return sortDesc ? -1 : 1;
+            return 0;
+        } else {
+            const valA = getNormalizedItemPrice(a, sortBy);
+            const valB = getNormalizedItemPrice(b, sortBy);
+            
+            // Always push items with no valid prices to the very bottom, regardless of sort direction
+            if (valA === Infinity && valB === Infinity) return 0;
+            if (valA === Infinity) return 1;
+            if (valB === Infinity) return -1;
+
+            return sortDesc ? valB - valA : valA - valB;
+        }
+    });
+}
+
 function renderHistory() {
-  const items = getVisibleItems().sort((a, b) => b.createdAt - a.createdAt);
+  const items = sortItems(getVisibleItems());
   if (!items.length) { els.historyList.innerHTML = `<div class="card"><p>No items match.</p></div>`; return; }
   els.historyList.innerHTML = items.map(item => generateCardHTML(item, false)).join('');
 }
 
 function renderShopping() {
-  if (!state.shopping.length) { els.shoppingList.innerHTML = `<div class="card"><p>Your list is empty.</p></div>`; return; }
-  els.shoppingList.innerHTML = state.shopping.map(item => generateCardHTML(item, true)).join('');
+  // Setup the dropdown to match saved state
+  els.shoppingStoreFilter.value = state.filters.shoppingStore || '';
+  
+  // Dynamically update the top title
+  const storeFilter = state.filters.shoppingStore;
+  if (activeTab === 'shopping') {
+      els.viewTitle.textContent = storeFilter ? `${storeFilter} Shopping List` : 'Shopping List';
+  }
+
+  // Filter the items based on their lastSelectedStore
+  let filteredShopping = state.shopping;
+  if (storeFilter) {
+      filteredShopping = filteredShopping.filter(item => item.lastSelectedStore === storeFilter);
+  }
+
+  if (!filteredShopping.length) { 
+      els.shoppingList.innerHTML = `<div class="card"><p>Your list is empty.</p></div>`; 
+      return; 
+  }
+  
+  filteredShopping.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+
+  els.shoppingList.innerHTML = filteredShopping.map(item => generateCardHTML(item, true)).join('');
 }
 
 function renderViewTitle() {
@@ -413,7 +523,12 @@ function showTab(tab) {
   els.tabs.forEach((btn) => { const on = btn.dataset.tab === tab; btn.classList.toggle('active', on); btn.setAttribute('aria-selected', String(on)); });
   Object.entries(els.panels).forEach(([name, panel]) => panel.classList.toggle('active', name === tab));
   $('#historyToolbar').style.display = tab === 'history' ? 'flex' : 'none';
+  
   renderViewTitle();
+  // Ensure the store name persists in the title when navigating back to shopping
+  if (tab === 'shopping' && state.filters.shoppingStore) {
+      els.viewTitle.textContent = `${state.filters.shoppingStore} Shopping List`;
+  }
 }
 
 function updateAndRender() { saveState(); renderHistory(); renderShopping(); }
@@ -434,7 +549,6 @@ function upsertItem() {
     iconKey: els.iconKey.value,
     storeDetails: structuredClone(editingStoreDetails), 
     tags: [...currentModalTags], // <-- Change this line
-    createdAt: existingItem?.createdAt || Date.now(),
     lastSelectedStore: existingItem?.lastSelectedStore || null
   };
 
@@ -493,8 +607,11 @@ function switchCardStoreInfo(actionEl) {
    
    const priceStats = card.querySelector(`#price-stats-${item.id}`);
    if(priceStats) {
-      // Replaced money(d.unitPrice) here as well
-      const unitMarkup = d.unitPrice ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${Number(d.unitPrice).toFixed(2)}¢</div></div>` : '';
+      const isLb = d.unitType === 'lb';
+      const unitVal = Number(d.unitPrice).toFixed(2);
+      const unitDisplay = isLb ? `$${unitVal}` : `${unitVal}¢`;
+      
+      const unitMarkup = d.unitPrice ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${unitDisplay}</div></div>` : '';
       priceStats.innerHTML = `<div class="price-group"><div class="price">${money(d.price)}</div></div>${unitMarkup}`;
    }
    
@@ -565,11 +682,19 @@ function initEvents() {
     state.filters.minPrice = els.filterMinPrice.value; 
     state.filters.maxPrice = els.filterMaxPrice.value; 
     state.filters.onlyWithUrl = els.onlyWithUrl.checked;
+    
+    state.filters.sortBy = els.filterSortBy.value;
+    state.filters.sortDesc = els.filterSortOrder.value === 'desc';
+    
     saveState(); renderHistory(); closeFilterModal();
   });
   els.clearFilters.addEventListener('click', () => {
-    state.filters = { query: '', store: '', tag: '', minPrice: '', maxPrice: '', onlyWithUrl: false };
+    state.filters = { query: '', store: '', tag: '', minPrice: '', maxPrice: '', onlyWithUrl: false, sortBy: 'name', sortDesc: false };
     els.searchInput.value = ''; els.filterStore.value = ''; els.filterTag.value = ''; els.filterMinPrice.value = ''; els.filterMaxPrice.value = ''; els.onlyWithUrl.checked = false;
+    
+    els.filterSortBy.value = 'name';
+    els.filterSortOrder.value = 'asc';
+    
     saveState(); renderHistory();
   });
 
@@ -609,6 +734,12 @@ function initEvents() {
   els.shoppingList.addEventListener('change', (e) => {
     const input = e.target.closest('[data-action="toggle-bought"]');
     if (input) toggleBought(input.dataset.id, input.checked);
+  });
+
+  els.shoppingStoreFilter.addEventListener('change', (e) => {
+      state.filters.shoppingStore = e.target.value;
+      saveState();
+      renderShopping();
   });
 
   els.tagInputField.addEventListener('keydown', (e) => {
