@@ -282,10 +282,6 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); box-sha
   color: var(--text); 
 }
 
-select {
-  padding-right: 32px;
-}
-
 .tag-input-container {
   display: flex;
   flex-wrap: wrap;
