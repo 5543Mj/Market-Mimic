@@ -13,13 +13,11 @@ const STORE_OPTIONS = ['Albertsons', 'Amazon', 'Costco', 'HEB', 'Kroger', 'Targe
 const STORE_HOME_URLS = {
   'Albertsons': 'https://www.albertsons.com/',
   'Amazon': 'https://www.amazon.com/',
-  'Costco': 'https://www.costco.com/',
   'HEB': 'https://www.heb.com/',
   'Kroger': 'https://www.kroger.com/',
   'Target': 'https://www.target.com/',
   'TraderJoes': 'https://www.traderjoes.com/',
   'Walmart': 'https://www.walmart.com/',
-  'WinCo': 'https://www.wincofoods.com/'
 };
 const THEMES = ['default', 'ocean', 'sunset'];
 
@@ -65,13 +63,13 @@ const state = migrateState(loadState()) ?? {
       storeDetails: {
         'Albertsons': { price: 3.49, unitSize: 128, unitPrice: 2.73, unitType: 'oz', url: 'https://www.albertsons.com/shop/product-details.136010121.html' },
         'Amazon': { price: 5.19, unitSize: 128, unitPrice: 4.05, unitType: 'oz', url: 'https://www.amazon.com/dp/B074VDFX51' },
-        'Costco': { price: 6.59, unitSize: 256, unitPrice: 2.57, unitType: 'oz', url: 'https://app.warehouserunner.com/costco/2-kirkland-signature-homogenized-milk-2-1-gal' },
+        'Costco': { price: 6.59, unitSize: 256, unitPrice: 2.57, unitType: 'oz' },
         'HEB': { price: 3.86, unitSize: 128, unitPrice: 3.02, unitType: 'oz', url: 'https://www.heb.com/product-detail/h-e-b-whole-milk-1-gal/314130' },
         'Kroger': { price: 3.29, unitSize: 128, unitPrice: 2.57, unitType: 'oz', url: 'https://www.kroger.com/p/kroger-vitamin-d-whole-milk-gallon/0001111040101' },
         'Target': { price: 4.59, unitSize: 128, unitPrice: 3.59, unitType: 'oz', url: 'https://www.target.com/p/meadow-gold-milk/-/A-94758362?preselect=81585047' },
         'TraderJoes': { price: 5.69, unitSize: 64, unitPrice: 8.89, unitType: 'oz', url: 'https://www.traderjoes.com/home/products/pdp/organic-lactose-free-reduced-fat-milk-082978' },
         'Walmart': { price: 3.82, unitSize: 128, unitPrice: 2.98, unitType: 'oz', url: 'https://www.walmart.com/ip/Great-Value-Whole-Vitamin-D-Milk-Gallon-Plastic-Jug-128-Fl-Oz/10450114' },
-        'WinCo': { price: 3.75, unitSize: 128, unitPrice: 2.93, unitType: 'oz', url: 'https://www.wincofoods.com/ '}
+        'WinCo': { price: 3.75, unitSize: 128, unitPrice: 2.93, unitType: 'oz' }
       },
       },
   ],
@@ -788,6 +786,16 @@ function initEvents() {
     }
     swipeStartX = null;
   }, { passive: true });
+
+  // Fix for iOS Safari keeping the page pushed up after the keyboard closes
+  document.addEventListener('focusout', (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+          // A tiny delay ensures the keyboard is actually out of the way before resetting
+          setTimeout(() => {
+              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+          }, 100);
+      }
+  });
 }
 
 function loadQuotes() {
