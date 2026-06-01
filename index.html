@@ -114,7 +114,8 @@
         Tags (Press Enter to add)
         <div class="tag-input-container">
           <div id="tagChipContainer" class="tag-chip-container"></div>
-          <input id="tagInputField" placeholder="Add a tag..." autocomplete="off" />
+          <input id="tagInputField" list="tagSuggestions" placeholder="Add a tag..." autocomplete="off" />
+          <datalist id="tagSuggestions"></datalist>
         </div>
       </label>
 
@@ -154,7 +155,8 @@
 
       <label class="full">
         Tag
-        <input id="filterTag" placeholder="dairy" />
+        <input id="filterTag" list="filterTagSuggestions" placeholder="dairy" />
+        <datalist id="filterTagSuggestions"></datalist>
       </label>
 
       <label class="full">
