@@ -1,13 +1,18 @@
 const STORAGE_KEY = 'mimicMart';
 
 const DEFAULT_ICONS = {
-  box: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7l8-4 8 4-8 4-8-4Z"></path><path d="M4 7v10l8 4 8-4V7"></path><path d="M12 11v10"></path></svg>`,
-  drink: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v3l2 3v12H6V9l2-3V3Z"></path><path d="M9 3h6"></path><path d="M8 10h8"></path></svg>`,
-  cart: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7"></path><circle cx="10" cy="19" r="1.5"></circle><circle cx="17" cy="19" r="1.5"></circle></svg>`,
-  apple: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2-3 5-3 6-1 1 2 1 5-1 7-1 2-3 4-5 4s-4-2-5-4c-2-2-2-5-1-7 1-2 4-2 6 1Z"></path><path d="M12 6c0-2 1-3 3-4"></path></svg>`,
+  apple: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="64" height="64" viewBox="0 0 512 512" style="color: rgb(255, 255, 255);"><path fill="currentColor" d="M452.415 213.048c-10.609-27.192-27.511-48.256-48.92-61.078a157.7 157.7 0 0 1-17.583 26.757l.115.063c31.881 18.323 50.423 65.148 45.091 113.871c-8.833 80.721-33.35 136.043-69.036 155.775c-23.2 12.827-52.133 11-86-5.424l-3.308-1.6h-24.389l-3.307 1.6c-33.867 16.426-62.8 18.251-86 5.424c-35.685-19.732-60.2-75.054-69.036-155.775c-5.332-48.723 13.211-95.549 45.091-113.871a66.6 66.6 0 0 1 33.74-8.768c24.143 0 51.966 11.311 82.2 33.656l1.078.8s43.583-5.299 60.849-13.138c52.021-23.617 63.5-61.156 65.536-66.254a121.9 121.9 0 0 0-1.021-93.559l-4.073-10.169l-10.949.11A122.777 122.777 0 0 0 242.039 159.7c-18.9-10.59-37.278-17.343-54.884-20.14c-24.943-3.965-47.811-.1-67.968 11.486c-22.138 12.724-39.581 34.164-50.442 62c-9.874 25.307-13.608 54.817-10.514 83.094c10.142 92.681 39.659 155.027 85.361 180.3a99.9 99.9 0 0 0 49.1 12.543c19.585 0 40.629-5.194 62.975-15.575h9.83c42.394 19.693 80.085 20.718 112.071 3.032c45.7-25.271 75.221-87.617 85.363-180.3c3.092-28.275-.642-57.785-10.516-83.092M328.019 60.826a90.5 90.5 0 0 1 23.693-6.564a90.8 90.8 0 0 1-75.056 115.205a90.84 90.84 0 0 1 51.363-108.641"></path></svg>`,
   basket: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h14l-1 10H6L5 9Z"></path><path d="M8 9c0-3 2-5 4-5s4 2 4 5"></path></svg>`,
-  bread: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10c0-4 4-7 8-7s8 3 8 7v9H4v-9Z"></path><path d="M8 10v9M12 10v9M16 10v9"></path></svg>`,
+  box: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="64" height="64" viewBox="0 0 24 24" style="color: rgb(255, 255, 255);"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m12 21l7.794-4.5v-9M12 21l-7.794-4.5v-9M12 21v-9m7.794-4.5L12 3L4.206 7.5m15.588 0L12 12M4.206 7.5L12 12"></path></svg>`,
+  bread: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="64" height="64" viewBox="0 0 24 24" style="color: rgb(255, 255, 255);"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8.5 4C5.043 4 2 5.593 2 7.559c0 1.364 1.643 2.38 1.433 3.662l-.244 4.557c-.106 1.98-.159 2.97.41 3.596C4.17 20 5.126 20 7.036 20h2.93c1.91 0 2.865 0 3.435-.626c.57-.625.517-1.616.41-3.596l-.243-4.557C13.357 9.938 15 8.923 15 7.559C15 5.593 11.957 4 8.5 4Z"></path><path d="M11 20h6.184c1.827 0 2.74 0 3.286-.626c.545-.625.494-1.616.393-3.596l-.234-4.557C20.429 9.938 22 8.923 22 7.559C22 5.593 19.09 4 15.783 4H8"></path></g></svg>`,
+  candy: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="64" height="64" viewBox="0 0 16 16" style="color: rgb(255, 255, 255);"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><circle cx="8" cy="8" r="3.25"></circle><path d="m7.25 11.25c0 1-.5 2.5-1.5 3-.75 0-1.5-1-2-2-1-.5-2-1.5-2-2 .5-1 2-1.5 3-1.5m4-4c0-1 .5-2.5 1.5-3 .75 0 1.5 1 2 2 1 .5 2 1.5 2 2-.5 1-2 1.5-3 1.5"></path></g></svg>`,
+  carrot: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="64" height="64" viewBox="0 0 24 24" style="color: rgb(255, 255, 255);"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 23q10-2 14-6a1 1 0 0 0-8-8q-4 4-6 14m3-9l2 2m9 1l-3-3m3-13a1 1 0 0 0 8 8q-4-4-8 0q4-4 0-8"></path></svg>`,
+  drink: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="64" height="64" viewBox="0 0 24 24" style="color: rgb(255, 255, 255);"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M8 2h8M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.789a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.788V2"></path><path d="M7 15a6.47 6.47 0 0 1 5 0a6.47 6.47 0 0 0 5 0"></path></g></svg>`,
+  jar: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="64" height="64" viewBox="0 0 48 48" style="color: rgb(255, 255, 255);"><g fill="none" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" d="M15 24s-.5 3 1 9"></path><path stroke-linecap="round" stroke-linejoin="round" d="M37.567 12C38.727 14.81 40 18.642 40 21.938c0 3.877-1.345 11.412-2.315 16.339c-.544 2.765-2.982 4.723-5.8 4.723H16.042c-2.785 0-5.203-1.914-5.762-4.642C9.314 33.638 8 26.402 8 21.938c0-3.679 1.444-7.306 2.827-9.938"></path><path d="M11.587 6.457a1 1 0 0 1 .84-.457h23.147a1 1 0 0 1 .84.457l2.587 4a1 1 0 0 1-.84 1.543H9.839a1 1 0 0 1-.84-1.543z"></path></g></svg>`,
+  sugar: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="64" height="64" viewBox="0 0 48 48" style="color: rgb(255, 255, 255);"><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M34.459 10.048a1 1 0 0 1 .973.207l8.235 7.379a1 1 0 0 1 .31.958l-2.353 10.783a1 1 0 0 1-.718.753l-10.588 2.838a1 1 0 0 1-.961-.254l-4.56-4.5a1 1 0 1 1 1.406-1.424l4.15 4.098l9.447-2.532l2.099-9.62l-7.374-6.606l-9.556 3.073l-1.018 3.11a1 1 0 1 1-1.901-.622l1.176-3.595a1 1 0 0 1 .645-.64z"></path><path d="M32.722 20.025a1 1 0 0 1 .753 1.197l-2.5 11a1 1 0 0 1-1.95-.444l2.5-11a1 1 0 0 1 1.197-.753"></path><path d="M23.738 13.853a1 1 0 0 1 1.409-.116l7.265 6.16l6.825-1.862a1 1 0 1 1 .526 1.93l-7.333 2a1 1 0 0 1-.91-.202l-7.666-6.5a1 1 0 0 1-.116-1.41m-12.996 1.424a1 1 0 0 1 .965-.239l8.27 2.361a1 1 0 0 1 .695.714l2.297 8.972a1 1 0 0 1-.308.999L16.23 33.75a1 1 0 0 1-.936.212L7.023 31.6a1 1 0 0 1-.69-.7l-2.298-8.5a1 1 0 0 1 .275-.984zm.967 1.842L6.12 22.452l1.994 7.38l7.202 2.056l5.563-4.9l-2.003-7.823z"></path><path d="M17.707 20.293a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-.974.256l-8-2.222a1 1 0 1 1 .535-1.927l7.438 2.066l3.587-3.587a1 1 0 0 1 1.414 0"></path><path d="M12.758 24.03a1 1 0 0 1 1.212.727l2 8a1 1 0 0 1-1.94.486l-2-8a1 1 0 0 1 .728-1.213"></path></g></svg>`
 };
+
+//item: `<svg>`,
 
 const STORE_OPTIONS = ['Albertsons', 'Amazon', 'Costco', 'HEB', 'Kroger', 'Target', "Trader Joe's", 'Walmart', 'WinCo']; 
 const STORE_HOME_URLS = {
@@ -123,11 +128,13 @@ const els = {
   storeDetailsContainer: $('#storeDetailsContainer'),
   tagChipContainer: $('#tagChipContainer'),
   tagInputField: $('#tagInputField'),
+  tagSuggestions: $('#tagSuggestions'),
   filterModal: $('#filterModal'),
   filterModalBackdrop: $('#filterModalBackdrop'),
   closeFilterModal: $('#closeFilterModal'),
   filterStore: $('#filterStore'),
   filterTag: $('#filterTag'),
+  filterTagSuggestions: $('#filterTagSuggestions'),
   filterMinPrice: $('#filterMinPrice'),
   filterMaxPrice: $('#filterMaxPrice'),
   filterSortBy: $('#filterSortBy'),
@@ -146,6 +153,15 @@ function money(value) {
   const n = Number(value);
   return Number.isFinite(n) ? `$${n.toFixed(2)}` : '—';
 }
+
+function updateTagSuggestions() {
+    // Gather all tags, flatten them, get unique values, and sort alphabetically
+    const allTags = state.items.flatMap(item => item.tags || []);
+    const uniqueTags = [...new Set(allTags)].sort((a, b) => a.localeCompare(b));
+    const optionsMarkup = uniqueTags.map(tag => `<option value="${escapeHtml(tag)}">`).join('');
+
+    if (els.tagSuggestions) els.tagSuggestions.innerHTML = optionsMarkup;
+    if (els.filterTagSuggestions) els.filterTagSuggestions.innerHTML = optionsMarkup;}
 
 function parseTags(str = '') { return str.split(',').map((t) => t.trim()).filter(Boolean); }
 function uniq(arr) { return [...new Set(arr)]; }
@@ -203,6 +219,7 @@ function openItemModal(item = null) {
   currentModalTags = item?.tags ? [...item.tags] : [];
   renderModalTags();
   els.tagInputField.value = '';
+  updateTagSuggestions();
 
   if (item) {
       els.deleteItemBtn.classList.remove('hidden');
@@ -251,8 +268,9 @@ function renderStoreDetailsFields() {
               <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitSize" value="${data.unitSize || ''}" placeholder="oz/lb" />
               <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitPrice" value="${data.unitPrice}" placeholder="¢ per oz/lb" />
               <select data-store="${store}" data-field="unitType">
-                 <option value="oz" ${data.unitType === 'oz' ? 'selected' : ''}>oz</option>
-                 <option value="lb" ${data.unitType === 'lb' ? 'selected' : ''}>lb</option>
+                  <option value="oz" ${data.unitType === 'oz' ? 'selected' : ''}>oz</option>
+                  <option value="lb" ${data.unitType === 'lb' ? 'selected' : ''}>lb</option>
+                  <option value="ea" ${data.unitType === 'ea' ? 'selected' : ''}>item</option>
               </select>
             </div>
          </label>
@@ -279,8 +297,8 @@ els.storeDetailsContainer.addEventListener('input', (e) => {
        const type = editingStoreDetails[store].unitType || 'oz';
        
        if (!isNaN(price) && !isNaN(size) && size > 0) {
-           // If 'lb', leave as dollars. If 'oz', multiply by 100 for cents.
-           const calculated = type === 'lb' 
+           // Treat 'ea' (item) and 'lb' as dollars, 'oz' as cents
+           const calculated = (type === 'lb' || type === 'ea') 
                ? (price / size).toFixed(2) 
                : ((price / size) * 100).toFixed(2);
                
@@ -302,6 +320,8 @@ function openFilterModal() {
   els.filterSortBy.value = state.filters.sortBy || 'name';
   els.filterSortOrder.value = state.filters.sortDesc ? 'desc' : 'asc';
   
+  updateTagSuggestions();
+
   openModal(els.filterModal, els.filterModalBackdrop);
 }
 function closeFilterModal() { closeModal(els.filterModal, els.filterModalBackdrop); }
@@ -368,12 +388,25 @@ function generateCardHTML(item, isShoppingList = false) {
     if (selectedStore) {
         const d = item.storeDetails[selectedStore];
         
-        const isLb = d.unitType === 'lb';
-        const unitVal = Number(d.unitPrice).toFixed(2);
-        const unitDisplay = isLb ? `$${unitVal}` : `${unitVal}¢`;
+        const isDollarUnit = d.unitType === 'lb' || d.unitType === 'ea';
+        const unitPriceNum = Number(d.unitPrice);
+        let unitDisplay;
+        
+        if (isDollarUnit) {
+            unitDisplay = `$${unitPriceNum.toFixed(2)}`;
+        } else {
+            // It's an ounce. If it's 100 cents ($1.00) or more, format as dollars.
+            if (unitPriceNum >= 100) {
+                unitDisplay = `$${(unitPriceNum / 100).toFixed(2)}`;
+            } else {
+                unitDisplay = `${unitPriceNum.toFixed(2)}¢`;
+            }
+        }
+        
+        const typeLabel = d.unitType === 'ea' ? 'Item' : (d.unitType || 'oz');
         
         const unitMarkup = d.unitPrice 
-           ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${unitDisplay}</div></div>` 
+           ? `<div class="price-group"><div class="small">Per ${typeLabel}</div><div class="small" style="color:var(--text);">${unitDisplay}</div></div>` 
            : '';
 
         priceMarkup = `
@@ -436,15 +469,13 @@ function getNormalizedItemPrice(item, type) {
     let validPrices = [];
     
     if (type === 'minPricePer') {
-        // Extract valid unit prices, converting lbs to oz so they sort fairly
         validPrices = stores
             .filter(d => d.unitPrice && Number(d.unitPrice) > 0)
-            .map(d => d.unitType === 'lb' ? (Number(d.unitPrice) * 100) / 16 : Number(d.unitPrice));
-    } else if (type === 'minPrice') {
-        // Extract valid total prices
-        validPrices = stores
-            .filter(d => d.price && Number(d.price) > 0)
-            .map(d => Number(d.price));
+            .map(d => {
+                if (d.unitType === 'lb') return (Number(d.unitPrice) * 100) / 16;
+                if (d.unitType === 'ea') return Number(d.unitPrice) * 100; // Convert item dollars to cents for fair sorting
+                return Number(d.unitPrice); // oz is already in cents
+            });
     }
     
     // If an item has no prices entered, assign it Infinity so it drops to the bottom
@@ -492,22 +523,25 @@ function renderShopping() {
   // Dynamically update the top title
   const storeFilter = state.filters.shoppingStore;
   if (activeTab === 'shopping') {
-      els.viewTitle.textContent = storeFilter ? `${storeFilter} Shopping List` : 'Shopping List';
+    els.viewTitle.textContent = storeFilter ? `${storeFilter} Shopping List` : 'Shopping List';
   }
 
   // Filter the items based on their lastSelectedStore
   let filteredShopping = state.shopping;
   if (storeFilter) {
-      filteredShopping = filteredShopping.filter(item => item.lastSelectedStore === storeFilter);
+    filteredShopping = filteredShopping.filter(item => item.lastSelectedStore === storeFilter);
   }
 
   if (!filteredShopping.length) { 
-      els.shoppingList.innerHTML = `<div class="card"><p>Your list is empty.</p></div>`; 
-      return; 
+    els.shoppingList.innerHTML = `<div class="card"><p>Your list is empty.</p></div>`; 
+    return; 
   }
   
-  filteredShopping.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-
+  filteredShopping.sort((a, b) => {
+    if (a.bought && !b.bought) return 1;   // Send 'a' down if it's bought
+    if (!a.bought && b.bought) return -1;  // Keep 'a' up if it's not bought
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); // Alphabetical fallback
+  });
   els.shoppingList.innerHTML = filteredShopping.map(item => generateCardHTML(item, true)).join('');
 }
 
@@ -605,11 +639,25 @@ function switchCardStoreInfo(actionEl) {
    
    const priceStats = card.querySelector(`#price-stats-${item.id}`);
    if(priceStats) {
-      const isLb = d.unitType === 'lb';
-      const unitVal = Number(d.unitPrice).toFixed(2);
-      const unitDisplay = isLb ? `$${unitVal}` : `${unitVal}¢`;
+      const isDollarUnit = d.unitType === 'lb' || d.unitType === 'ea';
+        const unitPriceNum = Number(d.unitPrice);
+        let unitDisplay;
+        
+        if (isDollarUnit) {
+            unitDisplay = `$${unitPriceNum.toFixed(2)}`;
+        } else {
+            // It's an ounce. If it's 100 cents ($1.00) or more, format as dollars.
+            if (unitPriceNum >= 100) {
+                unitDisplay = `$${(unitPriceNum / 100).toFixed(2)}`;
+            } else {
+                unitDisplay = `${unitPriceNum.toFixed(2)}¢`;
+            }
+        }        
+      const typeLabel = d.unitType === 'ea' ? 'Item' : (d.unitType || 'oz');
       
-      const unitMarkup = d.unitPrice ? `<div class="price-group"><div class="small">Per ${d.unitType || 'oz'}</div><div class="small" style="color:var(--text);">${unitDisplay}</div></div>` : '';
+      const unitMarkup = d.unitPrice 
+           ? `<div class="price-group"><div class="small">Per ${typeLabel}</div><div class="small" style="color:var(--text);">${unitDisplay}</div></div>` 
+           : '';
       priceStats.innerHTML = `<div class="price-group"><div class="price">${money(d.price)}</div></div>${unitMarkup}`;
    }
    
@@ -742,11 +790,15 @@ function initEvents() {
 
   els.tagInputField.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-          e.preventDefault(); // Stop the whole form from submitting
-          const val = e.target.value.trim();
-          if (val && !currentModalTags.includes(val)) {
-              currentModalTags.push(val);
-              renderModalTags();
+          e.preventDefault();
+          const rawVal = e.target.value.trim();
+          if (rawVal) {
+              // Capitalize the very first letter and attach the rest of the string
+              const val = rawVal.charAt(0).toUpperCase() + rawVal.slice(1);
+              if (!currentModalTags.includes(val)) {
+                  currentModalTags.push(val);
+                  renderModalTags();
+              }
           }
           e.target.value = '';
       }
@@ -772,20 +824,6 @@ function initEvents() {
           renderModalTags();
       }
   });
-
-  const swipeArea = document.querySelector('.main-panel');
-  swipeArea.addEventListener('touchstart', (e) => swipeStartX = e.changedTouches[0].clientX, { passive: true });
-  swipeArea.addEventListener('touchend', (e) => {
-    if (swipeStartX === null) return;
-    const dx = e.changedTouches[0].clientX - swipeStartX;
-    if (Math.abs(dx) > 60) {
-      const order = ['history', 'shopping', 'settings'];
-      const idx = order.indexOf(activeTab);
-      if (dx < 0 && idx < order.length - 1) showTab(order[idx + 1]);
-      if (dx > 0 && idx > 0) showTab(order[idx - 1]);
-    }
-    swipeStartX = null;
-  }, { passive: true });
 
   // Fix for iOS Safari keeping the page pushed up after the keyboard closes
   document.addEventListener('focusout', (e) => {
