@@ -110,14 +110,14 @@
 
       <div id="storeDetailsContainer" class="full store-details-grid"></div>
 
-      <label class="full">
-        Tags (Press Enter to add)
+      <div class="full" style="display: grid; gap: 6px;">
+        <label for="tagInputField" style="color: var(--muted); font-size: .9rem;">Tags (Press Enter to add)</label>
         <div class="tag-input-container">
           <div id="tagChipContainer" class="tag-chip-container"></div>
           <input id="tagInputField" list="tagSuggestions" placeholder="Add a tag..." autocomplete="off" />
           <datalist id="tagSuggestions"></datalist>
         </div>
-      </label>
+      </div>
 
       <div class="form-actions full" style="justify-content: space-between;">
         <button type="button" class="secondary-btn danger-text hidden" id="deleteItemBtn">Delete Item</button>
