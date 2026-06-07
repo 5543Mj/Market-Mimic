@@ -14,10 +14,11 @@ const DEFAULT_ICONS = {
 
 //item: `<svg>`,
 
-const STORE_OPTIONS = ['Albertsons', 'Amazon', 'Costco', 'HEB', 'Kroger', 'Target', "Trader Joe's", 'Walmart', 'WinCo']; 
+const STORE_OPTIONS = ['Albertsons', 'Amazon', 'BYUI Store', 'Costco', 'HEB', 'Kroger', 'Target', "Trader Joe's", 'Walmart', 'WinCo']; 
 const STORE_HOME_URLS = {
   'Albertsons': 'https://www.albertsons.com/',
   'Amazon': 'https://www.amazon.com/',
+  'Costco': 'https://sameday.costco.com/',
   'HEB': 'https://www.heb.com/',
   'Kroger': 'https://www.kroger.com/',
   'Target': 'https://www.target.com/',
@@ -157,11 +158,18 @@ function money(value) {
 function updateTagSuggestions() {
     // Gather all tags, flatten them, get unique values, and sort alphabetically
     const allTags = state.items.flatMap(item => item.tags || []);
+    // Sorting A-Z is handled right here with localeCompare
     const uniqueTags = [...new Set(allTags)].sort((a, b) => a.localeCompare(b));
-    const optionsMarkup = uniqueTags.map(tag => `<option value="${escapeHtml(tag)}">`).join('');
+    
+    // 1. Filter dropdown gets everything
+    const filterMarkup = uniqueTags.map(tag => `<option value="${escapeHtml(tag)}">`).join('');
+    if (els.filterTagSuggestions) els.filterTagSuggestions.innerHTML = filterMarkup;
 
-    if (els.tagSuggestions) els.tagSuggestions.innerHTML = optionsMarkup;
-    if (els.filterTagSuggestions) els.filterTagSuggestions.innerHTML = optionsMarkup;}
+    // 2. Item modal dropdown excludes tags currently applied to the item
+    const modalSuggestions = uniqueTags.filter(tag => !currentModalTags.includes(tag));
+    const modalMarkup = modalSuggestions.map(tag => `<option value="${escapeHtml(tag)}">`).join('');
+    if (els.tagSuggestions) els.tagSuggestions.innerHTML = modalMarkup;
+}
 
 function parseTags(str = '') { return str.split(',').map((t) => t.trim()).filter(Boolean); }
 function uniq(arr) { return [...new Set(arr)]; }
@@ -268,9 +276,10 @@ function renderStoreDetailsFields() {
               <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitSize" value="${data.unitSize || ''}" placeholder="oz/lb" />
               <input type="number" step="0.01" min="0" data-store="${store}" data-field="unitPrice" value="${data.unitPrice}" placeholder="¢ per oz/lb" />
               <select data-store="${store}" data-field="unitType">
-                  <option value="oz" ${data.unitType === 'oz' ? 'selected' : ''}>oz</option>
-                  <option value="lb" ${data.unitType === 'lb' ? 'selected' : ''}>lb</option>
-                  <option value="ea" ${data.unitType === 'ea' ? 'selected' : ''}>item</option>
+                  <option value="oz" ${data.unitType === 'oz' ? 'selected' : ''}>Ounce</option>
+                  <option value="lb" ${data.unitType === 'lb' ? 'selected' : ''}>Pound</option>
+                  <option value="ea" ${data.unitType === 'ea' ? 'selected' : ''}>Item</option>
+                  <option value="ft" ${data.unitType === 'ft' ? 'selected' : ''}>Feet</option>
               </select>
             </div>
          </label>
@@ -376,8 +385,12 @@ function generateCardHTML(item, isShoppingList = false) {
         ? item.lastSelectedStore 
         : (stores[0] || null);
 
-    const tags = (item.tags || []).map((t) => `<span class="chip">${escapeHtml(t)}</span>`).join('');
-    
+    // Sort tags alphabetically and convert them into clickable action buttons
+    const sortedTags = [...(item.tags || [])].sort((a, b) => a.localeCompare(b));
+    const tags = sortedTags.map((t) => 
+        `<button type="button" class="chip tag-filter-btn" data-action="filter-by-tag" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</button>`
+    ).join('');
+
     const storeChipsMarkup = stores.map((s) => 
         `<button class="chip store-tab-btn ${s === selectedStore ? 'active-store' : ''}" data-action="switch-store" data-item-id="${item.id}" data-store="${escapeHtml(s)}">${escapeHtml(s)}</button>`
     ).join('');
@@ -580,7 +593,7 @@ function upsertItem() {
     name: els.itemName.value.trim(), 
     iconKey: els.iconKey.value,
     storeDetails: structuredClone(editingStoreDetails), 
-    tags: [...currentModalTags], // <-- Change this line
+    tags: [...currentModalTags].sort((a, b) => a.localeCompare(b)),
     lastSelectedStore: existingItem?.lastSelectedStore || null
   };
 
@@ -774,6 +787,19 @@ function initEvents() {
       const item = source.find((x) => x.id === id);
       if (item) { editingIconItemId = null; openItemModal(item); }
     }
+    if (action === 'filter-by-tag') {
+        const selectedTag = actionEl.dataset.tag;
+        state.filters.tag = selectedTag;
+        saveState();
+        
+        // Sync the text in the modal so it matches the active filter
+        if (els.filterTag) els.filterTag.value = selectedTag; 
+        
+        // Jump to the history tab where filtering applies and scroll to top
+        showTab('history');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        renderHistory();
+    }
     if (action === 'switch-store') switchCardStoreInfo(actionEl);
   });
 
@@ -798,6 +824,7 @@ function initEvents() {
               if (!currentModalTags.includes(val)) {
                   currentModalTags.push(val);
                   renderModalTags();
+                  updateTagSuggestions();
               }
           }
           e.target.value = '';
@@ -822,6 +849,7 @@ function initEvents() {
       if (!isNaN(idx) && idx >= 0 && idx < currentModalTags.length) {
           currentModalTags.splice(idx, 1);
           renderModalTags();
+          updateTagSuggestions();
       }
   });
 
